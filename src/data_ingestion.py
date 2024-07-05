@@ -105,7 +105,7 @@ class Components:
 
         # Save
         self.metadata.to_csv(self.config.metadata_file, index=False)
-        print(f"-->Metadata saved to {self.config.metadata_file}")
+        print(f"--> Metadata saved to {self.config.metadata_file}")
         
 # Pipeline
 STAGE_NAME = 'Data Download and Preparation'
