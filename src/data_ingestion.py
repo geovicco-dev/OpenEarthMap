@@ -40,16 +40,18 @@ class Components:
         self.config = cfg
     
     def download_data(self, unzip: bool = True, remove_zip: bool = False) -> None:
-        if not Path(self.config.out_dir).joinpath("OpenEarthMap.zip").exists():
-            print(f">>>>>>>>>>>> Downloading data from Zenodo <<<<<<<<<<<<")
+        print(f">>>>>>>>>>>> Downloading data from Zenodo <<<<<<<<<<<<")
+        if not Path(self.config.out_dir).joinpath("OpenEarthMap_wo_xBD").exists() and not Path(self.config.out_dir).joinpath("OpenEarthMap.zip").exists():
             cmd = f"zenodo_get -e -d {self.config.doi} -o {self.config.out_dir}"
             subprocess.run(cmd, shell=True)
             if unzip:
-                print(f">>>>>>>>>>>> Unzipping data <<<<<<<<<<<<")
+                print(f"--> Unzipping data")
                 cmd = f"unzip -q {self.config.out_dir}/OpenEarthMap.zip -d {self.config.out_dir}"
                 subprocess.run(cmd, shell=True)
                 if remove_zip:
                     os.remove(f"{self.config.out_dir}/OpenEarthMap.zip")
+        else:
+            print("--> Data already downloaded. Skipping.")
             
     def aggregate_data(self) -> None:
         print(f">>>>>>>>>>>> Aggregating data <<<<<<<<<<<<")
@@ -66,10 +68,10 @@ class Components:
                     self.images.append(img)
                     self.masks.append(label)
                     
-        print(f"Number of images with labels: {len(self.images)}")
+        print(f"--> Number of images with labels: {len(self.images)}")
         
         # Delete images without labels
-        print(">>>>>>>>>>>> Deleting images without labels <<<<<<<<<<<<")
+        print("--> Deleting images without labels")
         for img in imgs:
             if img not in self.images:
                 os.remove(img)
@@ -96,14 +98,14 @@ class Components:
         val_df["group"] = "val"
         test_df["group"] = "test"
         
-        print(f"Number of images in train/val/test sets: {len(train_df)}, {len(val_df)}, {len(test_df)}")
+        print(f"--> Number of images in train/val/test sets: {len(train_df)}, {len(val_df)}, {len(test_df)}")
 
         # Combine
         self.metadata = pd.concat([train_df, val_df, test_df], axis=0)
 
         # Save
         self.metadata.to_csv(self.config.metadata_file, index=False)
-        print(f"Metadata saved to {self.config.metadata_file}")
+        print(f"-->Metadata saved to {self.config.metadata_file}")
         
 # Pipeline
 STAGE_NAME = 'Data Download and Preparation'
