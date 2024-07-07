@@ -10,7 +10,7 @@ ensure==1.0.4
 python-box==7.1.1
 zenodo-get==1.6.1
 scikit-learn==1.5.1
-albumentations==1.4.8
+albumentations==1.4.11
 joblib==1.4.2
 numpy==1.26.4
 PyYAML==6.0.1
