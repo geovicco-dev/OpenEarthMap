@@ -72,10 +72,8 @@ class SegmentationModel(pl.LightningModule):
         # Loss function
         if self.loss in ['DiceLoss', 'FocalLoss', 'TverskyLoss', 'JaccardLoss', 'LovaszLoss']:
             self.loss_fn = self.loss_dict[self.loss](mode=self.mode, from_logits=True)
-        # else:
-        #     self.loss_fn = self.loss_dict[self.loss]()
-        # self.loss_fn = torch.nn.CrossEntropyLoss()
-        # self.loss_fn = sm_torch.losses.DiceLoss(mode='multiclass', from_logits=True)
+        else:
+            self.loss_fn = self.loss_dict[self.loss]()
 
     def forward(self, x):
         return self.model(x)
@@ -109,6 +107,8 @@ class SegmentationModel(pl.LightningModule):
             self.logger.experiment.add_scalar(f'{stage}/Precision', precision, self.global_step)
             self.logger.experiment.add_scalar(f'{stage}/Loss', loss, self.global_step)
             self.logger.experiment.add_scalar(f'{stage}/LearningRate', self.lr, self.global_step)
+            
+        # return self.log_dict
 
     def training_step(self, batch, batch_idx):
         return self.shared_step(batch, "train")
@@ -117,31 +117,7 @@ class SegmentationModel(pl.LightningModule):
         return self.shared_step(batch, "val")
         
     def test_step(self, batch, batch_idx):
-        x, y = batch
-        y_hat = self(x)
-        loss = self.loss_fn(y_hat, y)
-        y_hat = torch.sigmoid(y_hat)
-        tp, fp, fn, tn = sm_torch.metrics.get_stats(y_hat, y, mode=self.mode, threshold=0.5)
-        
-        iou_score = sm_torch.metrics.iou_score(tp, fp, fn, tn, reduction="micro")
-        f1_score = sm_torch.metrics.f1_score(tp, fp, fn, tn, reduction="micro")
-        f2_score = sm_torch.metrics.fbeta_score(tp, fp, fn, tn, beta=2, reduction="micro")
-        recall = sm_torch.metrics.recall(tp, fp, fn, tn, reduction="micro-imagewise")
-        precision = sm_torch.metrics.precision(tp, fp, fn, tn, reduction="micro-imagewise")
-        
-        log_dict = {
-            "test_loss": loss,
-            "test_iou": iou_score,
-            "test_f1": f1_score,
-            "test_f2": f2_score,
-            "test_precision": precision,
-            "test_recall": recall,
-        }
-
-        # log values
-        self.log_dict(log_dict, prog_bar=True, on_step=False, on_epoch=True)
-        
-        return log_dict
+        return self.shared_step(batch, "test")
     
     def on_validation_epoch_end(self):
         metrics = self.trainer.logged_metrics
@@ -158,11 +134,6 @@ class SegmentationModel(pl.LightningModule):
 
         # Log the mean metrics
         self.log_dict(mean_outputs, prog_bar=True)
-        
-    # def configure_optimizers(self):
-    #     opt = torch.optim.Adam(self.parameters(), lr=self.lr)
-    #     sch = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=10)
-    #     return [opt], [sch]
     
     def configure_optimizers(self):
         optimizer = get_optimizer(self.optimizer, self.parameters(), self.lr)

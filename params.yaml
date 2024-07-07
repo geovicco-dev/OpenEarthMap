@@ -8,8 +8,8 @@ train_test_val_split:
 random_seed: 37
 
 # Data Loader
-batch_size: 2
-num_workers: 6
+batch_size: 6
+num_workers: 8
 resize_dimension: 512
 apply_preprocessing: False
 
@@ -17,11 +17,11 @@ apply_preprocessing: False
 architecture: DeepLabV3Plus # https://smp.readthedocs.io/en/latest/models.html
 encoder: resnet18 # https://smp.readthedocs.io/en/latest/encoders.html
 encoder_weights: imagenet
-epochs: 25 # Must be greter than the epoch number in the checkpoint otherwise it will throw an error. If no checkpoint is available then it will start from scratch so adjust accordingly.
-lr: 0.004
+epochs: 5 # Must be greter than the epoch number in the checkpoint otherwise it will throw an error. If no checkpoint is available then it will start from scratch so adjust accordingly.
+lr: 0.001
 n_classes: 8
 tune_lr: False
-dev_run: True # Only for testing purposes - executes only 1 epoch without training - not compatible with checkpoint
+dev_run: False # Only for testing purposes - executes only 1 epoch without training - not compatible with checkpoint
 n_channels: 3
 device: auto # cuda, cpu, mps, auto
 checkpoint_path: None # None if checkpoint not available
