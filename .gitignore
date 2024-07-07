@@ -1,5 +1,5 @@
 __pycache__
 .DS_Store
-data
+data/OpenEarthMap_wo_xBD
 logs
 models
