@@ -2,4 +2,4 @@
     autostage = true
     remote = filecloud
 ['remote "filecloud"']
-    url = /Users/geovicco/cloudmount/My Files/dvcstorage
+    url = https://dvcstore.geovicco.xyz/url/r4ikrrtehnrcmgbt
