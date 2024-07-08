@@ -1,6 +1,6 @@
 doi: 10.5281/zenodo.7223446
 out_dir: data
-metadata_file: data/metadata.csv
+metadata_file: metadata.csv
 train_test_val_split:
   - 0.75 # Training
   - 0.15 # Validation

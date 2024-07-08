@@ -21,3 +21,4 @@ lightning==2.2.5
 tensorboardx==2.6.2.2
 torch-tb-profiler==0.4.3
 onnx==1.16.1
+dvc-ssh==4.1.1
