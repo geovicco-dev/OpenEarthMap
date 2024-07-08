@@ -103,7 +103,7 @@ class OEMDataModule(L.LightningDataModule):
             )
             
     def train_dataloader(self):
-        return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, drop_last=True, prefetch_factor=self.batch_size,pin_memory=True, num_workers=self.num_workers)
+        return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, drop_last=True, prefetch_factor=self.batch_size,pin_memory=False, num_workers=self.num_workers)
 
     def val_dataloader(self):
         return DataLoader(self.val_dataset, batch_size=self.batch_size, shuffle=False, prefetch_factor=self.batch_size, drop_last=False, num_workers=self.num_workers)

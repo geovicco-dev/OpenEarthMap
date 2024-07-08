@@ -82,6 +82,7 @@ class SegmentationModel(pl.LightningModule):
         image, mask = batch
         out = self.forward(image)
         loss = self.loss_fn(out, mask.long())
+        
         tp, fp, fn, tn = sm_torch.metrics.get_stats(torch.argmax(out, 1).unsqueeze(1), mask.long(), mode=self.mode, num_classes = self.n_classes)        
         iou_score = sm_torch.metrics.iou_score(tp, fp, fn, tn, reduction="macro-imagewise")
         f1_score = sm_torch.metrics.f1_score(tp, fp, fn, tn, reduction="macro-imagewise")
@@ -108,7 +109,14 @@ class SegmentationModel(pl.LightningModule):
             self.logger.experiment.add_scalar(f'{stage}/Loss', loss, self.global_step)
             self.logger.experiment.add_scalar(f'{stage}/LearningRate', self.lr, self.global_step)
             
-        # return self.log_dict
+        return {
+            "loss": loss,
+            "iou": iou_score,
+            "f1": f1_score,
+            "f2": f2_score,
+            "precision": precision,
+            "recall": recall
+        }
 
     def training_step(self, batch, batch_idx):
         return self.shared_step(batch, "train")
