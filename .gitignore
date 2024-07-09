@@ -5,3 +5,5 @@ logs
 models
 /metadata.csv
 .lr_find*
+lightning_logs
+/results

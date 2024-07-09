@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 from matplotlib.colors import ListedColormap
+from pathlib import Path
 
 # Plot sample from the training dataset
 def plot_train_batch(dm, n_samples=4, randomised=True):
@@ -95,6 +96,9 @@ def plot_test_batch(pipeline, savefig_path, randomised=True):
         axs[2, i].axis('off')
         if i == 0:
             axs[2, i].set_title('Predicted Mask')
+            
+    # Set SuperTitle
+    fig.suptitle(f'Test Batch Predictions: {Path(pipeline.config.checkpoint_path).parent.parent.stem} ({Path(pipeline.config.checkpoint_path).stem})', fontsize=14)
 
     plt.tight_layout()
     plt.savefig(savefig_path, bbox_inches='tight', pad_inches=0.1, dpi = 300)

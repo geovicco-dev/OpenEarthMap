@@ -137,7 +137,7 @@ class Components:
         from pytorch_lightning.loggers import TensorBoardLogger
 
         # Early stopping callback
-        self.early_stopping = EarlyStopping(
+        early_stopping = EarlyStopping(
             monitor='val_loss',  # Metric to monitor
             patience=10,          # Number of epochs with no improvement after which training will be stopped
             verbose=True,
@@ -145,7 +145,7 @@ class Components:
         )
 
         # Model checkpoint callback
-        self.checkpoint_callback = ModelCheckpoint(
+        checkpoint_callback = ModelCheckpoint(
             monitor='val_f1',   # Metric to monitor
             filename='{epoch:02d}-{val_f1:.2f}',  # Filename format
             save_top_k=1,         # Save the top k models
@@ -162,7 +162,9 @@ class Components:
 
         from pytorch_lightning.callbacks import LearningRateMonitor
         # Learning rate monitor
-        self.lr_monitor = LearningRateMonitor(logging_interval='epoch')
+        lr_monitor = LearningRateMonitor(logging_interval='epoch')
+        
+        self.callbacks = [early_stopping, checkpoint_callback, lr_monitor]
         
     def tune_lr(self):
         from pytorch_lightning.tuner.tuning import Tuner
@@ -183,13 +185,13 @@ class Components:
         print(f'Suggested learning rate: {self.new_lr}')
         
     def create_trainer(self):
-        print(f'------------- Training Model: {self.config.architecture} with {self.config.encoder} Encoder -------------')
+        print(f'------------- Creating Trainer -------------')
         self.trainer = pl.Trainer(
             accelerator=self.config.device,
             max_epochs=self.config.epochs,
             precision="16-mixed",
             logger= self.tensorboard_logger if hasattr(self, 'tensorboard_logger') else None,
-            callbacks=[self.early_stopping, self.checkpoint_callback, self.lr_monitor],
+            callbacks=self.callbacks if hasattr(self, 'callbacks') else None,
             enable_progress_bar=True,
             fast_dev_run=self.config.dev_run,
         )
@@ -220,8 +222,7 @@ class Components:
             self.metrics = test_results[0] if test_results else {}
             self.metrics_filepath = Path(self.config.results_dir).joinpath('metrics.json')
             # Save metrics to a file
-            print(f'Saving metrics to: {self.metrics_filepath}')
-            save_json(Path(self.config.metrics_filepath), self.metrics)  # Save the metrics to a file
+            save_json(Path(self.metrics_filepath), self.metrics)  # Save the metrics to a file
             
             # Save Model as ONNX
             if self.metrics['test_f1'] > self.config.metric_threshold:
@@ -242,7 +243,7 @@ class Components:
             plot_test_batch(
                 pipeline=self, 
                 randomised=False, 
-                savefig_path=Path(self.config.results_dir).joinpath(f"{Path(self.config.checkpoint_path).parent.parent.name}_predictions.png")
+                savefig_path=Path(self.config.results_dir).joinpath("test_predictions.png")
             )
             
 # Pipeline
@@ -258,6 +259,7 @@ class TrainEvaluatePipeline:
         if pipeline.config.evaluate and Path(pipeline.config.checkpoint_path).exists():
             # Evaluate the model
             try:
+                print(f'------------- Evaluating Model using Checkpoint: {pipeline.config.checkpoint_path} -------------')
                 pipeline.load_checkpoint()
                 pipeline.create_trainer()
                 pipeline.evaluate()
@@ -271,6 +273,7 @@ class TrainEvaluatePipeline:
         else:
             # Train the model
             try:
+                print(f'------------- Training Model: {pipeline.config.architecture} with {pipeline.config.encoder} Encoder -------------')
                 pipeline.initialise_model()
                 if pipeline.config.checkpoint_path is not None and Path(pipeline.config.checkpoint_path).exists():
                     pipeline.load_checkpoint()

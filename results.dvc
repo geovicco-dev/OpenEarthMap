@@ -1,0 +1,6 @@
+outs:
+- md5: 24fe80caf710b12835516e35589dda22.dir
+  size: 12158014
+  nfiles: 2
+  hash: md5
+  path: results
