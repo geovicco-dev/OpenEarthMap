@@ -24,18 +24,19 @@ tune_lr: True
 dev_run: False # Only for testing purposes - executes only 1 epoch without training - not compatible with checkpoint
 n_channels: 3
 device: auto # cuda, cpu, mps, auto
-checkpoint_path: logs/DeepLabV3Plus_efficientnet-b0/checkpoints/epoch=09-val_f1=0.53.ckpt # None if checkpoint not available
+checkpoint_path: logs/DeepLabV3Plus_efficientnet-b0/checkpoints/epoch=74-val_f1=0.56.ckpt # None if checkpoint not available
 # checkpoint_path: None
 optimizer: adamax
 loss: DiceLoss # https://smp.readthedocs.io/en/latest/losses.html
 models_dir: models
 logs_dir: logs
+save_best_checkpoint: True # Save model checkpoint only if the validation metric being monitored is improved
+metric_threshold: 0.56 # Save model checkpoint only if the validation metric being monitored is greater than the threshold and save_best_checkpoint is set to True. If no checkpoint is available then it will start from scratch so adjust accordingly. Ideally, it should be used when you want to save a model that meets the expected metric threshold. For example, this is useful when you want to resume training from a checkpoint.
 
 # Evaluation
-model_path: None
+evaluate: True
 save_predictions: True # Plots predictions on a randomly chosen batch from test dataloader and saves them as PNG
-f1_threshold: 0.7 # Save model as ONNX only if the evaluation test_f1 is greater than the f1_threshold
-# Baseline F1 Score - if the evaluation test_f1 is less than the f1_threshold then the model is considered as underperforming, otherwise it is considered as overperforming and the model is considered as good. We will save the model only if the evaluation test_f1 is greater than the f1_threshold. Model will be saved as ONNX format. The saved model will be used in production.
+results_dir: results
 
 # Available Losses
 # DiceLoss

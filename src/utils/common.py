@@ -5,6 +5,7 @@ import yaml
 from box.exceptions import BoxValueError
 import warnings; warnings.filterwarnings("ignore")
 from pathlib import Path
+import json
 
 @ensure_annotations 
 def read_yaml(path_to_yaml: Path) -> ConfigBox:
@@ -31,3 +32,16 @@ def execute_pipeline(stage_name, pipeline_class):
         print(f'Failed to execute pipeline for stage: {stage_name}')
         print(e)
         raise e
+
+@ensure_annotations
+def save_json(path: Path, data: dict):
+    """save json data
+
+    Args:
+        path (Path): path to json file
+        data (dict): data to be saved in json file
+    """
+    with open(path, "w") as f:
+        json.dump(data, f, indent=4)
+
+    print(f"json file saved at: {path}")
