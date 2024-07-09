@@ -128,7 +128,6 @@ class Components:
             print('Checkpoint loaded successfully')
         except Exception as e:
             print(f'Failed to load checkpoint: {e}')
-
     
     def create_callbacks(self):
         print('------------- Creating Callbacks -------------')

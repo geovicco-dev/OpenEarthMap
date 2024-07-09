@@ -15,8 +15,8 @@ apply_preprocessing: False
 
 # Training
 architecture: DeepLabV3Plus # https://smp.readthedocs.io/en/latest/models.html
-encoder: efficientnet-b0 # https://smp.readthedocs.io/en/latest/encoders.html
-encoder_weights: imagenet
+encoder: resnet50 # https://smp.readthedocs.io/en/latest/encoders.html
+encoder_weights: ssl
 epochs: 100 # Must be greter than the epoch number in the checkpoint otherwise it will throw an error. If no checkpoint is available then it will start from scratch so adjust accordingly.
 lr: 0.04
 n_classes: 9
@@ -24,18 +24,18 @@ tune_lr: True
 dev_run: False # Only for testing purposes - executes only 1 epoch without training - not compatible with checkpoint
 n_channels: 3
 device: auto # cuda, cpu, mps, auto
-checkpoint_path: logs/DeepLabV3Plus_efficientnet-b0/checkpoints/epoch=74-val_f1=0.56.ckpt # None if checkpoint not available
-# checkpoint_path: None
-optimizer: adamax
-loss: DiceLoss # https://smp.readthedocs.io/en/latest/losses.html
+# checkpoint_path: logs/DeepLabV3Plus_efficientnet-b0/checkpoints/epoch=74-val_f1=0.56.ckpt # None if checkpoint not available
+checkpoint_path: None
+optimizer: adam
+loss: JaccardLoss # https://smp.readthedocs.io/en/latest/losses.html
 models_dir: models
 logs_dir: logs
 save_best_checkpoint: True # Save model checkpoint only if the validation metric being monitored is improved
 metric_threshold: 0.56 # Save model checkpoint only if the validation metric being monitored is greater than the threshold and save_best_checkpoint is set to True. If no checkpoint is available then it will start from scratch so adjust accordingly. Ideally, it should be used when you want to save a model that meets the expected metric threshold. For example, this is useful when you want to resume training from a checkpoint.
 
 # Evaluation
-evaluate: True
-save_predictions: True # Plots predictions on a randomly chosen batch from test dataloader and saves them as PNG
+evaluate: False
+save_predictions: True # Plots predictions on single batch from test dataloader and saves them as PNG
 results_dir: results
 
 # Available Losses
